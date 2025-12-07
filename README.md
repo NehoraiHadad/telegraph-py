@@ -23,19 +23,19 @@ A complete Python wrapper for the [Telegraph API](https://telegra.ph/api).
 ### Basic installation (synchronous client only)
 
 ```bash
-pip install telegraph-api
+pip install telegraph-api-py
 ```
 
 ### With async support
 
 ```bash
-pip install telegraph-api[async]
+pip install telegraph-api-py[async]
 ```
 
 ### For development
 
 ```bash
-pip install telegraph-api[dev]
+pip install telegraph-api-py[dev]
 ```
 
 ## Quick Start

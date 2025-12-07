@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "telegraph-api"
+name = "telegraph-api-py"
 version = "1.0.0"
 description = "A complete Python wrapper for the Telegraph API"
 readme = "README.md"
@@ -61,7 +61,7 @@ dev = [
     "ruff>=0.1.0",
 ]
 all = [
-    "telegraph-api[async,dev]",
+    "telegraph-api-py[async,dev]",
 ]
 
 [project.urls]
