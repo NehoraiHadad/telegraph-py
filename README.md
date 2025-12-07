@@ -6,6 +6,16 @@
 
 A complete Python wrapper for the [Telegraph API](https://telegra.ph/api).
 
+## Related Projects
+
+This is part of the Telegraph tools ecosystem:
+
+| Project | Description | Package |
+|---------|-------------|---------|
+| [telegraph-mcp](https://github.com/NehoraiHadad/telegraph-mcp) | MCP Server for AI assistants | [![npm](https://img.shields.io/npm/v/telegraph-mcp)](https://www.npmjs.com/package/telegraph-mcp) |
+| [telegraph-js](https://github.com/NehoraiHadad/telegraph-js) | JavaScript/TypeScript library | [![npm](https://img.shields.io/npm/v/telegraph-api-client)](https://www.npmjs.com/package/telegraph-api-client) |
+| **telegraph-api-py** (this) | Python library | [![PyPI](https://img.shields.io/pypi/v/telegraph-api-py)](https://pypi.org/project/telegraph-api-py/) |
+
 ## Features
 
 - Full support for all 9 Telegraph API methods
@@ -17,6 +27,9 @@ A complete Python wrapper for the [Telegraph API](https://telegra.ph/api).
 - Context manager support
 - Zero dependencies for sync client (only `requests`)
 - Optional async support with `aiohttp`
+- **Image Upload** - Upload images and videos to Telegraph
+- **Templates** - Pre-built templates for common content types
+- **Export & Backup** - Export pages to Markdown/HTML and backup accounts
 
 ## Installation
 
@@ -426,6 +439,120 @@ nodes = parse_content("# Markdown content", format='markdown')
 
 # Convert nodes to JSON-serializable format
 json_nodes = nodes_to_json(nodes)
+
+# Convert nodes back to Markdown
+from telegraph import nodes_to_markdown
+markdown = nodes_to_markdown(page.content)
+
+# Convert nodes back to HTML
+from telegraph import nodes_to_html
+html = nodes_to_html(page.content)
+```
+
+## Image Upload
+
+Upload images and videos to Telegraph:
+
+```python
+# Upload from file path
+result = tg.upload_image(file_path="./image.jpg")
+print(f"Uploaded: {result.url}")
+
+# Upload from base64
+import base64
+with open("image.png", "rb") as f:
+    data = base64.b64encode(f.read()).decode()
+
+result = tg.upload_image(
+    base64_data=data,
+    content_type="image/png",
+    filename="image.png"
+)
+print(f"Uploaded: {result.url}")
+```
+
+Async version:
+
+```python
+async with AsyncTelegraph() as tg:
+    result = await tg.upload_image(file_path="./image.jpg")
+```
+
+Supported formats: JPEG, PNG, GIF, MP4
+
+## Templates
+
+Use pre-built templates for common content types:
+
+```python
+from telegraph import list_templates, create_from_template
+
+# List available templates
+templates = list_templates()
+# Returns: blog_post, documentation, article, changelog, tutorial
+
+# Create content from template
+nodes = create_from_template('blog_post', {
+    'title': 'My Blog Post',
+    'intro': 'This is the introduction',
+    'sections': [
+        {'heading': 'Section 1', 'content': 'First section content'},
+        {'heading': 'Section 2', 'content': 'Second section content'}
+    ],
+    'conclusion': 'Final thoughts'
+})
+
+# Use in create_page
+page = tg.create_page(
+    title='My Blog Post',
+    content=nodes
+)
+```
+
+### Available Templates
+
+| Template | Required Fields | Optional Fields |
+|----------|-----------------|-----------------|
+| `blog_post` | title, intro, sections[] | conclusion |
+| `documentation` | title, overview | installation, usage, api_reference[] |
+| `article` | title, body[] | subtitle |
+| `changelog` | title, version, date | added[], changed[], fixed[] |
+| `tutorial` | title, description, steps[] | prerequisites[], conclusion |
+
+## Export & Backup
+
+Export pages to Markdown or HTML, and backup entire accounts:
+
+```python
+from telegraph import export_page, backup_account
+
+# Export a single page
+exported = export_page(
+    path='My-Page-12-15',
+    format='markdown'  # or 'html'
+)
+print(exported.content)
+
+# Backup all pages from an account
+backup = backup_account(
+    access_token='your-token',
+    format='markdown',
+    limit=100  # max pages to export
+)
+
+print(f"Exported {backup.exported_count} of {backup.total_count} pages")
+for page in backup.pages:
+    print(f"{page.title}: {page.content[:100]}...")
+```
+
+Async versions are also available:
+
+```python
+from telegraph import export_page_async, backup_account_async
+
+async with AsyncTelegraph() as tg:
+    exported = await export_page_async(path='My-Page-12-15')
+    backup = await backup_account_async(access_token='token')
 ```
 
 ## Advanced Usage

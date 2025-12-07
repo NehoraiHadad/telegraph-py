@@ -37,6 +37,7 @@ from .types import (
     Node,
     NodeElement,
     AccountField,
+    UploadResult,
     ALLOWED_TAGS
 )
 from .errors import (
@@ -50,7 +51,24 @@ from .utils import (
     html_to_nodes,
     markdown_to_html,
     parse_content,
-    nodes_to_json
+    nodes_to_json,
+    nodes_to_markdown,
+    nodes_to_html
+)
+from .templates import (
+    Template,
+    TemplateField,
+    get_template,
+    list_templates,
+    create_from_template
+)
+from .export import (
+    ExportedPage,
+    AccountBackup,
+    export_page,
+    backup_account,
+    export_page_async,
+    backup_account_async
 )
 
 __all__ = [
@@ -69,6 +87,7 @@ __all__ = [
     'Node',
     'NodeElement',
     'AccountField',
+    'UploadResult',
     'ALLOWED_TAGS',
 
     # Errors
@@ -83,4 +102,21 @@ __all__ = [
     'markdown_to_html',
     'parse_content',
     'nodes_to_json',
+    'nodes_to_markdown',
+    'nodes_to_html',
+
+    # Templates
+    'Template',
+    'TemplateField',
+    'get_template',
+    'list_templates',
+    'create_from_template',
+
+    # Export
+    'ExportedPage',
+    'AccountBackup',
+    'export_page',
+    'backup_account',
+    'export_page_async',
+    'backup_account_async',
 ]

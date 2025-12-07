@@ -270,3 +270,143 @@ def nodes_to_json(nodes: List[Node]) -> List[Union[str, dict]]:
         elif isinstance(node, NodeElement):
             result.append(node.to_dict())
     return result
+
+
+def _node_element_to_markdown(node: NodeElement) -> str:
+    """
+    Convert a single NodeElement to Markdown string.
+
+    Args:
+        node: NodeElement to convert
+
+    Returns:
+        Markdown string
+    """
+    children = nodes_to_markdown(node.children) if node.children else ""
+    tag = node.tag
+
+    if tag == 'h3':
+        return f"\n# {children}\n"
+    if tag == 'h4':
+        return f"\n## {children}\n"
+    if tag == 'p':
+        return f"\n{children}\n"
+    if tag in ('b', 'strong'):
+        return f"**{children}**"
+    if tag in ('i', 'em'):
+        return f"*{children}*"
+    if tag == 'a':
+        href = node.attrs.get('href', '') if node.attrs else ''
+        return f"[{children}]({href})"
+    if tag == 'img':
+        src = node.attrs.get('src', '') if node.attrs else ''
+        return f"![image]({src})"
+    if tag in ('ul', 'ol'):
+        return f"\n{children}"
+    if tag == 'li':
+        return f"- {children}\n"
+    if tag == 'blockquote':
+        return f"\n> {children}\n"
+    if tag == 'code':
+        return f"`{children}`"
+    if tag == 'pre':
+        return f"\n```\n{children}\n```\n"
+    if tag == 'br':
+        return "\n"
+    if tag == 'hr':
+        return "\n---\n"
+    if tag == 's':
+        return f"~~{children}~~"
+    if tag == 'u':
+        return f"__{children}__"
+    if tag == 'aside':
+        return f"\n> {children}\n"
+    if tag == 'figure':
+        # Handle figure with possible img and figcaption
+        return children
+    if tag == 'figcaption':
+        return f"\n*{children}*\n"
+    if tag == 'video':
+        src = node.attrs.get('src', '') if node.attrs else ''
+        return f"\n[Video]({src})\n"
+    if tag == 'iframe':
+        src = node.attrs.get('src', '') if node.attrs else ''
+        return f"\n[Embed]({src})\n"
+
+    # Default: just return children
+    return children
+
+
+def nodes_to_markdown(nodes: List[Node]) -> str:
+    """
+    Convert Node array to Markdown string.
+
+    Args:
+        nodes: List of Node objects (strings or NodeElements)
+
+    Returns:
+        Markdown string
+
+    Example:
+        >>> nodes = [NodeElement(tag='p', children=['Hello ', NodeElement(tag='b', children=['world'])])]
+        >>> nodes_to_markdown(nodes)
+        '\\nHello **world**\\n'
+    """
+    markdown = ""
+    for node in nodes:
+        if isinstance(node, str):
+            markdown += node
+        else:
+            markdown += _node_element_to_markdown(node)
+    return markdown
+
+
+def _node_element_to_html(node: NodeElement) -> str:
+    """
+    Convert a single NodeElement to HTML string.
+
+    Args:
+        node: NodeElement to convert
+
+    Returns:
+        HTML string
+    """
+    tag = node.tag
+    attrs_str = ""
+
+    if node.attrs:
+        attrs_str = " " + " ".join(
+            f'{key}="{value}"' for key, value in node.attrs.items()
+        )
+
+    children = nodes_to_html(node.children) if node.children else ""
+
+    # Self-closing tags
+    if tag in ('br', 'hr', 'img'):
+        return f"<{tag}{attrs_str}/>"
+
+    return f"<{tag}{attrs_str}>{children}</{tag}>"
+
+
+def nodes_to_html(nodes: List[Node]) -> str:
+    """
+    Convert Node array to HTML string.
+
+    Args:
+        nodes: List of Node objects (strings or NodeElements)
+
+    Returns:
+        HTML string
+
+    Example:
+        >>> nodes = [NodeElement(tag='p', children=['Hello ', NodeElement(tag='b', children=['world'])])]
+        >>> nodes_to_html(nodes)
+        '<p>Hello <b>world</b></p>'
+    """
+    html = ""
+    for node in nodes:
+        if isinstance(node, str):
+            html += node
+        else:
+            html += _node_element_to_html(node)
+    return html

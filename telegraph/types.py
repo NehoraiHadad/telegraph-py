@@ -124,6 +124,17 @@ class PageViews:
 
 
 @dataclass
+class UploadResult:
+    """
+    Telegraph Upload Result object.
+
+    Attributes:
+        url: URL of the uploaded file
+    """
+    url: str
+
+
+@dataclass
 class ApiResponse:
     """
     Telegraph API Response wrapper.
