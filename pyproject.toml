@@ -65,11 +65,11 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/telegraph-py/telegraph-api"
-Documentation = "https://github.com/telegraph-py/telegraph-api#readme"
-Repository = "https://github.com/telegraph-py/telegraph-api"
-"Bug Tracker" = "https://github.com/telegraph-py/telegraph-api/issues"
-Changelog = "https://github.com/telegraph-py/telegraph-api/releases"
+Homepage = "https://github.com/NehoraiHadad/telegraph-py"
+Documentation = "https://github.com/NehoraiHadad/telegraph-py#readme"
+Repository = "https://github.com/NehoraiHadad/telegraph-py"
+"Bug Tracker" = "https://github.com/NehoraiHadad/telegraph-py/issues"
+Changelog = "https://github.com/NehoraiHadad/telegraph-py/releases"
 
 [tool.setuptools]
 packages = ["telegraph"]
