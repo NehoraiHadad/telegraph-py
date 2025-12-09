@@ -15,7 +15,7 @@ Example:
     >>> print(page.url)
 """
 
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 __author__ = "Telegraph Python Contributors"
 __license__ = "MIT"
 
@@ -37,7 +37,6 @@ from .types import (
     Node,
     NodeElement,
     AccountField,
-    UploadResult,
     ALLOWED_TAGS
 )
 from .errors import (
@@ -87,7 +86,6 @@ __all__ = [
     'Node',
     'NodeElement',
     'AccountField',
-    'UploadResult',
     'ALLOWED_TAGS',
 
     # Errors

@@ -2,16 +2,14 @@
 Telegraph API Client - Synchronous Implementation
 """
 
-import base64
 import json
 import logging
-import os
 from typing import List, Optional, Union
 from urllib.parse import urlencode
 
 import requests
 
-from .types import Account, Page, PageList, PageViews, Node, AccountField, UploadResult
+from .types import Account, Page, PageList, PageViews, Node, AccountField
 from .errors import (
     TelegraphError,
     TelegraphAPIError,
@@ -23,30 +21,6 @@ from .utils import parse_content, nodes_to_json
 
 
 logger = logging.getLogger(__name__)
-
-# Telegraph upload endpoint
-UPLOAD_URL = 'https://telegra.ph/upload'
-
-
-def _get_content_type(file_path: str) -> str:
-    """
-    Determine content type from file extension.
-
-    Args:
-        file_path: Path to the file
-
-    Returns:
-        MIME type string
-    """
-    ext = os.path.splitext(file_path)[1].lower()
-    types = {
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.gif': 'image/gif',
-        '.mp4': 'video/mp4'
-    }
-    return types.get(ext, 'application/octet-stream')
 
 
 class Telegraph:
@@ -549,109 +523,6 @@ class Telegraph:
         })
 
         return PageViews(**result)
-
-    def upload_image(
-        self,
-        file_path: Optional[str] = None,
-        base64_data: Optional[str] = None,
-        content_type: Optional[str] = None,
-        filename: Optional[str] = None
-    ) -> UploadResult:
-        """
-        Upload an image or video to Telegraph servers.
-
-        Supported file types:
-        - image/jpeg
-        - image/png
-        - image/gif
-        - video/mp4
-
-        Args:
-            file_path: Local file path to upload
-            base64_data: Base64 encoded file data (alternative to file_path)
-            content_type: MIME type (required with base64_data)
-            filename: Filename (required with base64_data)
-
-        Returns:
-            UploadResult with url field
-
-        Raises:
-            TelegraphValidationError: If validation fails
-            TelegraphAPIError: If the upload fails
-
-        Example:
-            >>> tg = Telegraph()
-            >>> result = tg.upload_image(file_path='/path/to/image.jpg')
-            >>> print(result.url)
-            https://telegra.ph/file/abc123.jpg
-        """
-        if file_path:
-            # Upload from file path
-            if not os.path.exists(file_path):
-                raise TelegraphValidationError(f"File not found: {file_path}", field="file_path")
-
-            with open(file_path, 'rb') as f:
-                file_data = f.read()
-
-            filename = os.path.basename(file_path)
-            content_type = _get_content_type(file_path)
-
-        elif base64_data and content_type:
-            # Upload from base64 data
-            try:
-                file_data = base64.b64decode(base64_data)
-            except Exception as e:
-                raise TelegraphValidationError(f"Invalid base64 data: {str(e)}", field="base64_data")
-
-            filename = filename or 'upload'
-
-        else:
-            raise TelegraphValidationError(
-                "Either file_path or (base64_data + content_type) required",
-                field="file_path"
-            )
-
-        # Validate content type
-        allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4']
-        if content_type not in allowed_types:
-            raise TelegraphValidationError(
-                f"Unsupported content type: {content_type}. Allowed: {', '.join(allowed_types)}",
-                field="content_type"
-            )
-
-        # Upload file
-        try:
-            files = {'file': (filename, file_data, content_type)}
-            response = self._session.post(UPLOAD_URL, files=files, timeout=self.timeout)
-
-            # Check HTTP status
-            if not response.ok:
-                raise TelegraphHTTPError(
-                    f"HTTP error: {response.status_code} {response.reason}",
-                    status_code=response.status_code,
-                    response_text=response.text
-                )
-
-            # Parse response
-            try:
-                result = response.json()
-            except json.JSONDecodeError as e:
-                raise TelegraphAPIError(f"Invalid JSON response: {str(e)}")
-
-            # Extract URL from response
-            if isinstance(result, list) and len(result) > 0 and result[0].get('src'):
-                return UploadResult(url=f"https://telegra.ph{result[0]['src']}")
-
-            # Handle error response
-            error_msg = result[0].get('error', 'Upload failed') if isinstance(result, list) else 'Upload failed'
-            raise TelegraphAPIError(error_msg)
-
-        except requests.exceptions.Timeout:
-            raise TelegraphConnectionError(f"Upload timeout after {self.timeout} seconds")
-        except requests.exceptions.ConnectionError as e:
-            raise TelegraphConnectionError(f"Connection error: {str(e)}")
-        except requests.exceptions.RequestException as e:
-            raise TelegraphError(f"Upload error: {str(e)}")
 
     def close(self) -> None:
         """Close the HTTP session."""

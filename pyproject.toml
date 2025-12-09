@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telegraph-api-py"
-version = "1.1.0"
+version = "1.2.0"
 description = "A complete Python wrapper for the Telegraph API"
 readme = "README.md"
 license = {text = "MIT"}
